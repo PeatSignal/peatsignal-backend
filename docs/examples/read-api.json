@@ -1,0 +1,387 @@
+{
+  "description": "Real application database responses; UUIDs and import times are snapshots",
+  "examples": {
+    "stations": {
+      "method": "GET",
+      "path": "/api/v1/stations",
+      "status": 200,
+      "body": [
+        {
+          "id": "519afb24-9abd-4f32-97cf-d0f9c73342e5",
+          "code": "BRG17",
+          "region": "Kubu Raya",
+          "latitude": null,
+          "longitude": null,
+          "coordinate_source": null,
+          "period_start": "2018-04-12",
+          "period_end": "2019-07-16",
+          "source": "mmc1.xlsx"
+        },
+        {
+          "id": "0b887eb6-e7ee-4a20-bf8f-5554eb407e4c",
+          "code": "BRG18",
+          "region": "Kubu Raya",
+          "latitude": null,
+          "longitude": null,
+          "coordinate_source": null,
+          "period_start": "2018-04-12",
+          "period_end": "2018-12-31",
+          "source": "mmc1.xlsx"
+        },
+        {
+          "id": "e8b3f9d2-1d87-40d5-b77e-f36fb61a0de5",
+          "code": "BRG19",
+          "region": "Kubu Raya",
+          "latitude": null,
+          "longitude": null,
+          "coordinate_source": null,
+          "period_start": "2018-04-12",
+          "period_end": "2019-12-31",
+          "source": "mmc1.xlsx"
+        },
+        {
+          "id": "2039bfb3-425b-4346-bbe0-26091c3428a3",
+          "code": "BRG20",
+          "region": "Kubu Raya",
+          "latitude": null,
+          "longitude": null,
+          "coordinate_source": null,
+          "period_start": "2018-04-13",
+          "period_end": "2019-12-31",
+          "source": "mmc1.xlsx"
+        },
+        {
+          "id": "4dd86392-cee6-4af9-b3dd-3a86fcaa5f4e",
+          "code": "BRG3",
+          "region": "Batanghari",
+          "latitude": null,
+          "longitude": null,
+          "coordinate_source": null,
+          "period_start": "2018-04-08",
+          "period_end": "2019-08-27",
+          "source": "mmc1.xlsx"
+        },
+        {
+          "id": "ec3009e0-c281-490a-bab8-492029baf3a1",
+          "code": "BRG4",
+          "region": "Batanghari",
+          "latitude": null,
+          "longitude": null,
+          "coordinate_source": null,
+          "period_start": "2018-04-08",
+          "period_end": "2018-12-28",
+          "source": "mmc1.xlsx"
+        },
+        {
+          "id": "aac99b24-8a38-4bad-b19c-a0d8a253dafd",
+          "code": "BRG5",
+          "region": "Batanghari",
+          "latitude": null,
+          "longitude": null,
+          "coordinate_source": null,
+          "period_start": "2018-04-11",
+          "period_end": "2019-12-31",
+          "source": "mmc1.xlsx"
+        },
+        {
+          "id": "3628bc1b-491e-4cb6-a5c6-55215761981f",
+          "code": "BRG6",
+          "region": "Batanghari",
+          "latitude": null,
+          "longitude": null,
+          "coordinate_source": null,
+          "period_start": "2018-04-11",
+          "period_end": "2019-10-07",
+          "source": "mmc1.xlsx"
+        }
+      ]
+    },
+    "groundwater_brg6": {
+      "method": "GET",
+      "path": "/api/v1/stations/3628bc1b-491e-4cb6-a5c6-55215761981f/groundwater?from=2019-08-17&to=2019-08-19&mode=HISTORICAL_REPLAY",
+      "status": 200,
+      "body": [
+        {
+          "id": "4a29e0ea-4407-4e67-b9d0-1471b9245765",
+          "station_id": "3628bc1b-491e-4cb6-a5c6-55215761981f",
+          "observed_date": "2019-08-17",
+          "observed_at": "2019-08-17T00:00:00Z",
+          "gwt_m": -1.025,
+          "quality_flag": "VALID",
+          "source": "mmc1.xlsx",
+          "source_id": "0d09f121-df0a-44f9-8c76-bf27557d7e8b",
+          "source_sha256": "fe3fd7dd964fc1b4adc6a9696c5693fc9496a6fc574a8266dafa93dc0503aa1b",
+          "mode": "HISTORICAL_REPLAY"
+        },
+        {
+          "id": "33af8d35-11bd-491e-9863-a6f931183c76",
+          "station_id": "3628bc1b-491e-4cb6-a5c6-55215761981f",
+          "observed_date": "2019-08-18",
+          "observed_at": "2019-08-18T00:00:00Z",
+          "gwt_m": -1.033,
+          "quality_flag": "VALID",
+          "source": "mmc1.xlsx",
+          "source_id": "0d09f121-df0a-44f9-8c76-bf27557d7e8b",
+          "source_sha256": "fe3fd7dd964fc1b4adc6a9696c5693fc9496a6fc574a8266dafa93dc0503aa1b",
+          "mode": "HISTORICAL_REPLAY"
+        },
+        {
+          "id": "287f871d-a738-44a2-b395-7330a90543ec",
+          "station_id": "3628bc1b-491e-4cb6-a5c6-55215761981f",
+          "observed_date": "2019-08-19",
+          "observed_at": "2019-08-19T00:00:00Z",
+          "gwt_m": -1.045,
+          "quality_flag": "VALID",
+          "source": "mmc1.xlsx",
+          "source_id": "0d09f121-df0a-44f9-8c76-bf27557d7e8b",
+          "source_sha256": "fe3fd7dd964fc1b4adc6a9696c5693fc9496a6fc574a8266dafa93dc0503aa1b",
+          "mode": "HISTORICAL_REPLAY"
+        }
+      ]
+    },
+    "groundwater_brg3": {
+      "method": "GET",
+      "path": "/api/v1/stations/4dd86392-cee6-4af9-b3dd-3a86fcaa5f4e/groundwater?from=2019-08-17&to=2019-08-19&mode=HISTORICAL_REPLAY",
+      "status": 200,
+      "body": [
+        {
+          "id": "a28bbcf3-b935-402c-8061-9b50f20cbb55",
+          "station_id": "4dd86392-cee6-4af9-b3dd-3a86fcaa5f4e",
+          "observed_date": "2019-08-17",
+          "observed_at": "2019-08-17T00:00:00Z",
+          "gwt_m": -1.608,
+          "quality_flag": "VALID",
+          "source": "mmc1.xlsx",
+          "source_id": "0d09f121-df0a-44f9-8c76-bf27557d7e8b",
+          "source_sha256": "fe3fd7dd964fc1b4adc6a9696c5693fc9496a6fc574a8266dafa93dc0503aa1b",
+          "mode": "HISTORICAL_REPLAY"
+        },
+        {
+          "id": "ca5f6153-2edd-4047-89b9-9f18ab421d30",
+          "station_id": "4dd86392-cee6-4af9-b3dd-3a86fcaa5f4e",
+          "observed_date": "2019-08-18",
+          "observed_at": "2019-08-18T00:00:00Z",
+          "gwt_m": -1.616,
+          "quality_flag": "VALID",
+          "source": "mmc1.xlsx",
+          "source_id": "0d09f121-df0a-44f9-8c76-bf27557d7e8b",
+          "source_sha256": "fe3fd7dd964fc1b4adc6a9696c5693fc9496a6fc574a8266dafa93dc0503aa1b",
+          "mode": "HISTORICAL_REPLAY"
+        },
+        {
+          "id": "cca9a26e-c54b-4a06-a63a-4c10995d935a",
+          "station_id": "4dd86392-cee6-4af9-b3dd-3a86fcaa5f4e",
+          "observed_date": "2019-08-19",
+          "observed_at": "2019-08-19T00:00:00Z",
+          "gwt_m": -1.623,
+          "quality_flag": "VALID",
+          "source": "mmc1.xlsx",
+          "source_id": "0d09f121-df0a-44f9-8c76-bf27557d7e8b",
+          "source_sha256": "fe3fd7dd964fc1b4adc6a9696c5693fc9496a6fc574a8266dafa93dc0503aa1b",
+          "mode": "HISTORICAL_REPLAY"
+        }
+      ]
+    },
+    "groundwater_duplicate": {
+      "method": "GET",
+      "path": "/api/v1/stations/aac99b24-8a38-4bad-b19c-a0d8a253dafd/groundwater?from=2019-03-21&to=2019-03-21&mode=HISTORICAL_REPLAY",
+      "status": 200,
+      "body": [
+        {
+          "id": "16ac0339-877b-426e-84b7-28b0af7fd32c",
+          "station_id": "aac99b24-8a38-4bad-b19c-a0d8a253dafd",
+          "observed_date": "2019-03-21",
+          "observed_at": "2019-03-21T00:00:00Z",
+          "gwt_m": null,
+          "quality_flag": "DUPLICATE",
+          "source": "mmc1.xlsx",
+          "source_id": "0d09f121-df0a-44f9-8c76-bf27557d7e8b",
+          "source_sha256": "fe3fd7dd964fc1b4adc6a9696c5693fc9496a6fc574a8266dafa93dc0503aa1b",
+          "mode": "HISTORICAL_REPLAY"
+        }
+      ]
+    },
+    "groundwater_missing": {
+      "method": "GET",
+      "path": "/api/v1/stations/2039bfb3-425b-4346-bbe0-26091c3428a3/groundwater?from=2019-03-01&to=2019-03-01",
+      "status": 200,
+      "body": [
+        {
+          "id": "9b447f5f-40f2-43a8-bbed-e2d85c426c03",
+          "station_id": "2039bfb3-425b-4346-bbe0-26091c3428a3",
+          "observed_date": "2019-03-01",
+          "observed_at": "2019-03-01T00:00:00Z",
+          "gwt_m": null,
+          "quality_flag": "MISSING",
+          "source": "mmc1.xlsx",
+          "source_id": "0d09f121-df0a-44f9-8c76-bf27557d7e8b",
+          "source_sha256": "fe3fd7dd964fc1b4adc6a9696c5693fc9496a6fc574a8266dafa93dc0503aa1b",
+          "mode": "HISTORICAL_REPLAY"
+        }
+      ]
+    },
+    "groundwater_current_empty": {
+      "method": "GET",
+      "path": "/api/v1/stations/3628bc1b-491e-4cb6-a5c6-55215761981f/groundwater?from=2026-10-01&to=2026-10-14&mode=CURRENT_MONITORING",
+      "status": 200,
+      "body": []
+    },
+    "groundwater_historical_empty": {
+      "method": "GET",
+      "path": "/api/v1/stations/3628bc1b-491e-4cb6-a5c6-55215761981f/groundwater?from=2019-11-01&to=2019-11-03",
+      "status": 200,
+      "body": []
+    },
+    "hotspots_page_1": {
+      "method": "GET",
+      "path": "/api/v1/hotspots?from=2019-08-17&to=2019-09-15&mode=HISTORICAL_REPLAY&bbox=102.9,-2.2,104,-1.3&satellite=N&source_product=VIIRS_SNPP_HISTORICAL&limit=2&offset=0",
+      "status": 200,
+      "body": {
+        "items": [
+          {
+            "id": "0079a997-afdc-45dd-a955-1c6af04fc933",
+            "external_key": "78cf37dcb0f84c748591d85e10f694d80ed0ec7e6b457e605a21d412bd07321d",
+            "latitude": -1.37287,
+            "longitude": 103.84729,
+            "acquired_at": "2019-09-15T18:16:00Z",
+            "source_product": "VIIRS_SNPP_HISTORICAL",
+            "sensor": "VIIRS",
+            "satellite": "N",
+            "frp": 4.01,
+            "confidence_raw": "n",
+            "verification_status": "UNVERIFIED",
+            "source": "viirs-snpp_2019_Indonesia.csv",
+            "quality_flag": "VALID",
+            "mode": "HISTORICAL_REPLAY",
+            "last_synced_at": "2026-10-14T16:08:57.820627Z"
+          },
+          {
+            "id": "03636092-2824-4a2e-b5ec-b81bd6d48727",
+            "external_key": "26e82429312ea915a6b80cfa44d2f6b89e9b290d2fc69415ebcbc6a2ffdc3bcd",
+            "latitude": -1.58144,
+            "longitude": 103.91479,
+            "acquired_at": "2019-09-15T18:16:00Z",
+            "source_product": "VIIRS_SNPP_HISTORICAL",
+            "sensor": "VIIRS",
+            "satellite": "N",
+            "frp": 1.1,
+            "confidence_raw": "n",
+            "verification_status": "UNVERIFIED",
+            "source": "viirs-snpp_2019_Indonesia.csv",
+            "quality_flag": "VALID",
+            "mode": "HISTORICAL_REPLAY",
+            "last_synced_at": "2026-10-14T16:08:57.820627Z"
+          }
+        ],
+        "total": 3439,
+        "limit": 2,
+        "offset": 0
+      }
+    },
+    "hotspots_page_2": {
+      "method": "GET",
+      "path": "/api/v1/hotspots?from=2019-08-17&to=2019-09-15&mode=HISTORICAL_REPLAY&bbox=102.9,-2.2,104,-1.3&satellite=N&source_product=VIIRS_SNPP_HISTORICAL&limit=2&offset=2",
+      "status": 200,
+      "body": {
+        "items": [
+          {
+            "id": "03ef343d-6d66-4f87-9473-e9591a55e4b3",
+            "external_key": "8dfec933bd5158c0f41f2a5bc63fd7120720c9f4c4a00d607e7080d799bbafd0",
+            "latitude": -1.71185,
+            "longitude": 103.96398,
+            "acquired_at": "2019-09-15T18:16:00Z",
+            "source_product": "VIIRS_SNPP_HISTORICAL",
+            "sensor": "VIIRS",
+            "satellite": "N",
+            "frp": 4.36,
+            "confidence_raw": "n",
+            "verification_status": "UNVERIFIED",
+            "source": "viirs-snpp_2019_Indonesia.csv",
+            "quality_flag": "VALID",
+            "mode": "HISTORICAL_REPLAY",
+            "last_synced_at": "2026-10-14T16:08:57.820627Z"
+          },
+          {
+            "id": "05fed2ec-5a4e-440b-b2ae-18e0f2ca2531",
+            "external_key": "3ba0b9df16f36fb9f0ad04fae5e2f8a2ea1de37b5a5a8005b28f6d5874bcdab9",
+            "latitude": -1.84688,
+            "longitude": 103.21931,
+            "acquired_at": "2019-09-15T18:16:00Z",
+            "source_product": "VIIRS_SNPP_HISTORICAL",
+            "sensor": "VIIRS",
+            "satellite": "N",
+            "frp": 0.75,
+            "confidence_raw": "n",
+            "verification_status": "UNVERIFIED",
+            "source": "viirs-snpp_2019_Indonesia.csv",
+            "quality_flag": "VALID",
+            "mode": "HISTORICAL_REPLAY",
+            "last_synced_at": "2026-10-14T16:08:57.820627Z"
+          }
+        ],
+        "total": 3439,
+        "limit": 2,
+        "offset": 2
+      }
+    },
+    "hotspots_current_empty": {
+      "method": "GET",
+      "path": "/api/v1/hotspots?mode=CURRENT_MONITORING",
+      "status": 200,
+      "body": {
+        "items": [],
+        "total": 0,
+        "limit": 200,
+        "offset": 0
+      }
+    },
+    "hotspots_bbox_empty": {
+      "method": "GET",
+      "path": "/api/v1/hotspots?bbox=0,0,1,1",
+      "status": 200,
+      "body": {
+        "items": [],
+        "total": 0,
+        "limit": 200,
+        "offset": 0
+      }
+    },
+    "invalid_bbox": {
+      "method": "GET",
+      "path": "/api/v1/hotspots?bbox=104,0,100,-3",
+      "status": 422,
+      "body": {
+        "detail": "bbox longitude must satisfy -180 <= west < east <= 180"
+      }
+    },
+    "invalid_date_range": {
+      "method": "GET",
+      "path": "/api/v1/hotspots?from=2019-09-15&to=2019-08-17",
+      "status": 422,
+      "body": {
+        "detail": "'from' must be on or before 'to'"
+      }
+    },
+    "invalid_station_uuid": {
+      "method": "GET",
+      "path": "/api/v1/stations/BRG6/groundwater",
+      "status": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "uuid_parsing",
+            "loc": [
+              "path",
+              "station_id"
+            ],
+            "msg": "Input should be a valid UUID, invalid character: found `R` at 1",
+            "input": "BRG6",
+            "ctx": {
+              "error": "invalid character: found `R` at 1"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

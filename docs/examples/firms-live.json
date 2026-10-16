@@ -1,0 +1,95 @@
+{
+  "description": "Successful local NASA live sync snapshot; times are UTC",
+  "historical_hotspots_unchanged": 6403,
+  "groundwater_unchanged": 3928,
+  "examples": {
+    "sync_status": {
+      "method": "GET",
+      "path": "/api/v1/hotspots/sync-status?area_id=batanghari&source_product=VIIRS_SNPP_NRT",
+      "body": [
+        {
+          "area_id": "batanghari",
+          "source_product": "VIIRS_SNPP_NRT",
+          "status": "SUCCESS",
+          "last_attempt": {
+            "id": "0987adf8-099f-4009-812e-0c435a1c37fd",
+            "area_id": "batanghari",
+            "source_product": "VIIRS_SNPP_NRT",
+            "status": "SUCCESS",
+            "date_from": "2026-10-12",
+            "date_to": "2026-10-14",
+            "started_at": "2026-10-14T19:13:38.202297Z",
+            "completed_at": "2026-10-14T19:13:39.799618Z",
+            "rows_received": 11,
+            "rows_inserted": 11,
+            "rows_conflicts": 0,
+            "error_code": null
+          },
+          "last_successful_at": "2026-10-14T19:13:39.799618Z"
+        }
+      ]
+    },
+    "cached_current_hotspots": {
+      "method": "GET",
+      "path": "/api/v1/hotspots?mode=CURRENT_MONITORING&limit=3&from=2026-10-12&to=2026-10-14&bbox=102.9,-2.2,104,-1.3&source_product=VIIRS_SNPP_NRT",
+      "body": {
+        "items": [
+          {
+            "id": "6112659f-cbb9-4cf7-98c3-b74f85f06481",
+            "external_key": "1c97dcdc4075c2f955686ea2eedb4616948888970481019f37746c8c40bc3526",
+            "latitude": -1.84472,
+            "longitude": 103.89934,
+            "acquired_at": "2026-10-14T05:59:00Z",
+            "source_product": "VIIRS_SNPP_NRT",
+            "sensor": "VIIRS",
+            "satellite": "N",
+            "frp": 4.4,
+            "confidence_raw": "n",
+            "verification_status": "UNVERIFIED",
+            "source": "NASA FIRMS Area API",
+            "quality_flag": "VALID",
+            "mode": "CURRENT_MONITORING",
+            "last_synced_at": "2026-10-14T19:13:39.744435Z"
+          },
+          {
+            "id": "d3a3bc9c-5d1a-43fe-9eac-7d67941b3c39",
+            "external_key": "66d12692536f46b9978bbdf6afc8eb80cb4a1973608484f938e7c2bf57a7f6c1",
+            "latitude": -1.83974,
+            "longitude": 103.93214,
+            "acquired_at": "2026-10-14T05:59:00Z",
+            "source_product": "VIIRS_SNPP_NRT",
+            "sensor": "VIIRS",
+            "satellite": "N",
+            "frp": 5.88,
+            "confidence_raw": "n",
+            "verification_status": "UNVERIFIED",
+            "source": "NASA FIRMS Area API",
+            "quality_flag": "VALID",
+            "mode": "CURRENT_MONITORING",
+            "last_synced_at": "2026-10-14T19:13:39.744435Z"
+          },
+          {
+            "id": "f0c28985-63fa-4089-a40a-6c07a961ea35",
+            "external_key": "7d2bec2024eb1f407e9552b74f6126c1a1b1b676f878ab13a57f5a937d966ae4",
+            "latitude": -1.844,
+            "longitude": 103.90407,
+            "acquired_at": "2026-10-14T05:59:00Z",
+            "source_product": "VIIRS_SNPP_NRT",
+            "sensor": "VIIRS",
+            "satellite": "N",
+            "frp": 4.4,
+            "confidence_raw": "n",
+            "verification_status": "UNVERIFIED",
+            "source": "NASA FIRMS Area API",
+            "quality_flag": "VALID",
+            "mode": "CURRENT_MONITORING",
+            "last_synced_at": "2026-10-14T19:13:39.744435Z"
+          }
+        ],
+        "total": 11,
+        "limit": 3,
+        "offset": 0
+      }
+    }
+  }
+}

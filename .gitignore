@@ -1,0 +1,20 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.py[cod]
+*.egg-info/
+htmlcov/
+.coverage
+var/
+
+
+# Private configuration and unpacked historical archives
+.env*
+!.env.example
+!.env.supabase.example
+api_key_firms.md
+dataset/*.csv
+*.log
+.DS_Store
