@@ -1,237 +1,182 @@
-> Repository terpisah: baca [panduan setup dan hosting](SPLIT_REPOSITORY.md).
+# PeatSignal — Backend
 
-# GambutOps Backend
+Backend API untuk aplikasi PeatSignal, menggunakan Python, FastAPI, dan PostgreSQL/PostGIS.
 
-Backend GambutOps: FastAPI/Pydantic, autentikasi role demo, PostgreSQL/PostGIS,
-ETL GWT, importer VIIRS historis, read API monitoring, decision engine, dan workflow lapangan.
+Panduan ini menjelaskan cara memasang dan menjalankan backend di komputer sendiri. Semua perintah dijalankan dari folder backend. Contoh perintah menggunakan terminal Linux/macOS atau WSL di Windows.
 
-## Menjalankan lokal
+## 1. Persiapan
 
-Gunakan Python 3.12+ dan Docker. Dari root repository ini:
+Pastikan sudah memasang:
+
+- Python versi **3.12 atau lebih baru**, beserta modul `venv`.
+- Docker dengan Docker Compose. Pastikan Docker sudah berjalan.
+
+Cek melalui terminal:
 
 ```bash
-[ -f .env ] || cp .env.example .env
+python3 --version
+docker --version
+docker compose version
+```
+
+## 2. Buka folder backend
+
+Unduh atau clone repository backend, lalu buka terminal di folder yang berisi `pyproject.toml` dan `docker-compose.yml`.
+
+Jika terminal masih berada di folder induk proyek, masuk ke folder backend:
+
+```bash
+cd peat-signal-backend
+```
+
+## 3. Buat database lokal dengan Docker
+
+Database dibuat **di komputer sendiri melalui Docker**. Tidak perlu membuat database lewat aplikasi lain. Ada dua tahap: Docker membuat database pada langkah ini, lalu migration membuat tabel pada langkah 5.
+
+Jika belum ada file `.env`, salin `.env.example` menjadi `.env`:
+
+```bash
+cp .env.example .env
+```
+
+Jika `.env` sudah ada, gunakan file tersebut tanpa menimpanya. Untuk database Docker lokal, salin nilai `DATABASE_URL` dari `.env.example` ke `.env`. Biarkan alamat `127.0.0.1` dan port `5433` sesuai contoh. Pastikan juga konfigurasi berikut tersedia:
+
+```dotenv
+APP_ENV=development
+CORS_ALLOWED_ORIGINS=http://localhost:3000
+```
+
+Buat dan jalankan database dengan perintah berikut:
+
+```bash
 docker compose up -d postgres
+```
+
+Saat pertama kali dijalankan, Docker otomatis menyiapkan PostgreSQL/PostGIS, membuat database dan pengguna sesuai `docker-compose.yml`, serta menyimpan datanya pada volume Docker. **Tidak perlu membuat database secara manual atau menjalankan `CREATE DATABASE`.** Pada penggunaan berikutnya, perintah yang sama menjalankan database yang sudah ada.
+
+Pengaturan database berada di file [docker-compose.yml](docker-compose.yml):
+
+| Pengaturan | Kegunaan |
+| --- | --- |
+| `POSTGRES_DB` | Nama database yang dibuat otomatis |
+| `POSTGRES_USER` | Pengguna untuk mengakses database |
+| `POSTGRES_PASSWORD` | Kata sandi database lokal |
+
+Untuk setup paling mudah, gunakan nilai bawaan dan `DATABASE_URL` dari `.env.example` agar keduanya cocok. Pengaturan tersebut berlaku saat volume database pertama kali dibuat.
+
+Cek status database:
+
+```bash
+docker compose ps
+```
+
+Tunggu sampai database berstatus **healthy** sebelum melanjutkan. Setelah itu, database sudah dibuat dan siap diisi tabel. Database memakai alamat `127.0.0.1` dengan port **5433** di komputer, sehingga bisa berjalan bersama PostgreSQL lain pada port 5432.
+
+Lanjutkan instalasi dependency pada langkah 4, kemudian jalankan migration pada langkah 5. Backend baru dijalankan setelah kedua langkah tersebut selesai.
+
+API key NASA FIRMS belum diperlukan untuk menjalankan API lokal. Jangan commit file `.env` atau kunci rahasia ke repository.
+
+## 4. Instalasi dependency
+
+Buat lingkungan Python terpisah untuk proyek, lalu pasang dependency:
+
+```bash
 python3 -m venv .venv
 .venv/bin/pip install -e '.[dev]'
-.venv/bin/alembic upgrade head
-.venv/bin/uvicorn app.main:app --reload
 ```
 
-API tersedia di `http://localhost:8000`, dokumentasi interaktif di `/docs`, kontrak mesin
-di `/openapi.json`, dan liveness di `/health`. Konfigurasi memakai nama environment tanpa
-prefix, seperti `DATABASE_URL` dan `FIRMS_MAP_KEY`; jangan commit `.env` atau kunci FIRMS.
+Tunggu sampai proses selesai. Instalasi membutuhkan koneksi internet. Perintah berikutnya memakai Python dari `.venv`, sehingga tidak perlu mengaktifkannya secara manual.
 
-PostgreSQL Docker diekspos pada `127.0.0.1:5433` (port container tetap 5432), sehingga dapat
-berjalan bersama PostgreSQL lokal pada port 5432. Jika `.env` sudah ada, sesuaikan port
-`DATABASE_URL` ke 5433; file tersebut tidak ditimpa otomatis.
+## 5. Siapkan tabel database
 
-### Supabase `hackaton_joints`
-
-Project Supabase `hackaton_joints` memakai ref `jzdoblbhliezskncojoy` di region Singapore.
-Schema sampai migration BE-06 (`20261015_0004`) dan PostGIS sudah dipasang melalui plugin
-Supabase. Untuk menjalankan backend melalui Supavisor session mode:
-
-```bash
-cp .env.supabase.example .env
-# Ganti URL_ENCODED_DATABASE_PASSWORD di .env dengan password database dari dashboard.
-.venv/bin/alembic current
-.venv/bin/uvicorn app.main:app --reload
-```
-
-Template ada di [.env.supabase.example](.env.supabase.example). Password harus di-URL-encode,
-disimpan hanya pada `.env`/secret deployment, dan tidak boleh memakai anon/publishable key.
-Session pooler port 5432 dipilih untuk backend SQLAlchemy persisten dan jaringan IPv4. Untuk
-migration/backup pada host IPv6, direct connection `db.jzdoblbhliezskncojoy.supabase.co:5432`
-dapat digunakan. Backend tetap menjadi satu-satunya jalur akses aplikasi ke tabel domain.
-
-Migration `20261015_0005` menerapkan pola FastAPI-only: RLS aktif pada seluruh tabel aplikasi,
-akses tabel langsung untuk role Data API `anon`/`authenticated` dicabut, dan tidak ada policy
-client-side. Jangan memakai Supabase JS/Data API untuk tabel domain; frontend memanggil FastAPI.
-Objek internal extension PostGIS seperti `spatial_ref_sys` tetap dikelola oleh Supabase.
-
-Handoff frontend yang mengikuti kontrak backend tersedia di
-[read-api-handoff.md](docs/read-api-handoff.md), termasuk contoh respons database aplikasi.
-
-## FIRMS live (BE-04)
-
-Sync manual NASA, cache Current Monitoring, dan status global sudah tersedia.
-Panduan konfigurasi key, endpoint coordinator, CLI, cooldown dan contoh respons nyata:
-[firms-handoff.md](docs/firms-handoff.md).
+Setelah database dibuat pada langkah 3, jalankan migration untuk membuat atau memperbarui tabel di dalamnya:
 
 ```bash
 .venv/bin/alembic upgrade head
-.venv/bin/python scripts/configure_firms_key.py
-.venv/bin/python -m app.cli sync-hotspots --area batanghari --product VIIRS_SNPP_NRT --apply
 ```
 
-`GET /api/v1/hotspots/sync-status` membaca status sync; `GET /api/v1/hotspots?mode=CURRENT_MONITORING`
-membaca cache. Keduanya tidak memanggil NASA. Cooldown berlaku sepuluh menit per area/produk.
+Migration juga menyiapkan akun demo. Data pemantauan perlu diimpor secara terpisah jika ingin menampilkan data historis.
 
-## Autentikasi demo
-
-Endpoint write memakai `Authorization: Bearer <token>`. Pada development/test saja tersedia
-token deterministik `demo-coordinator-token` dan `demo-field-officer-token`. Untuk production,
-`COORDINATOR_TOKEN` dan `FIELD_OFFICER_TOKEN` wajib diisi dengan nilai kuat
-minimal 32 karakter dan berbeda; aplikasi menolak startup bila keduanya tidak valid. Kedua identitas demo memiliki
-UUID stabil yang diseed oleh migration awal.
-
-Contoh:
+## 6. Jalankan backend
 
 ```bash
-curl http://localhost:8000/health
-curl -H 'Authorization: Bearer demo-coordinator-token' \
-  http://localhost:8000/api/v1/auth/me
+.venv/bin/uvicorn app.main:app --reload
 ```
 
-Endpoint stations, groundwater, hotspots, priorities, tasks, reports, dan users sudah membaca
-atau menulis database.
-Priorities juga menyimpan snapshot ber-versi secara idempotent; lihat
-[kontrak BE-05](docs/priorities-handoff.md). Workflow task/report mengikuti state machine,
-role, ownership, dan history pada [handoff BE-06](docs/tasks-handoff.md). Endpoint ML metrics dan
-forecast historis tersedia setelah model dilatih; detailnya ada di [handoff ML](docs/ml-handoff.md).
+Biarkan terminal tetap terbuka selama backend digunakan. Buka alamat berikut untuk memeriksa hasilnya:
 
-## Workflow lapangan (BE-06)
+| Alamat | Kegunaan |
+| --- | --- |
+| http://localhost:8000/health | Memeriksa apakah API berjalan |
+| http://localhost:8000/docs | Dokumentasi interaktif untuk mencoba endpoint |
+| http://localhost:8000/openapi.json | Kontrak API dalam format JSON |
 
-Coordinator dapat membuat/menugaskan task dan meninjau laporan. Field officer yang ditugaskan
-dapat memulai pekerjaan dan mengirim laporan SIMULASI. Transisi ilegal menghasilkan `409`,
-pelanggaran role/ownership menghasilkan `403`, dan setiap perubahan menyimpan aktor/timestamp.
+Untuk menghentikan server, tekan **Ctrl+C** di terminal.
+
+Saat ingin menjalankan kembali, cukup jalankan dari folder backend:
 
 ```bash
-curl 'http://localhost:8000/api/v1/users?role=field_officer'
-curl 'http://localhost:8000/api/v1/tasks?status=OPEN,ASSIGNED'
+docker compose up -d postgres
+.venv/bin/uvicorn app.main:app --reload
 ```
 
-Contoh write, seluruh transisi, payload laporan, dan catatan adapter frontend tersedia di
-[tasks-handoff.md](docs/tasks-handoff.md). Endpoint write wajib Bearer token; backend mengabaikan
-identitas aktor buatan dari client.
+Tidak perlu mengulang instalasi. Jalankan `alembic upgrade head` kembali jika ada migration baru. Untuk menghentikan database setelah selesai, gunakan `docker compose stop postgres`.
 
-## Eksperimen GWT +1 hari (BE-07)
+## 7. Isi data historis (opsional)
 
-Pipeline eksperimen melatih `RandomForestRegressor` untuk BRG6 dan BRG3 dengan fitur lag
-1/3/7 hari, rolling mean yang sudah digeser, dan perubahan historis. Missing, konflik duplikat,
-serta tanggal kalender yang terputus tidak diinterpolasi dan tidak digunakan sebagai lag.
-Split train/validation/test selalu kronologis; parameter dipilih pada validation lalu test hanya
-dievaluasi sekali. Baseline persistence dan model memakai tanggal test yang sama.
+Jika memakai database baru dan ingin mencoba data tinggi muka air tanah, impor dataset yang disertakan:
+
+```bash
+.venv/bin/python -m app.cli import-gwt dataset/mmc1.xlsx --apply
+```
+
+Untuk menyiapkan hasil eksperimen prediksi historis:
 
 ```bash
 .venv/bin/python -m app.cli train-gwt dataset/mmc1.xlsx
 ```
 
-Output lengkap, termasuk prediksi test, ditulis ke `var/ml/*.metrics.json` dan diabaikan Git.
-Angka tersebut adalah **HASIL EKSPERIMEN HISTORIS 2018–2019**, bukan forecast kondisi 2026.
-Model yang tidak mengalahkan baseline diberi gate `EXPERIMENT_ONLY` dan tidak boleh dipakai
-oleh decision engine. Training menyimpan manifest metrics dan artifact `.joblib` ber-versi.
-`GET /api/v1/ml/metrics` dan `POST /api/v1/ml/forecast` menyediakan hasil eksperimen dan
-forecast historis dengan tujuh lag kalender lengkap. Kontrak integrasi tersedia di
-[ml-handoff.md](docs/ml-handoff.md).
+Hasilnya adalah eksperimen data historis, bukan prediksi kondisi saat ini. Data titik panas historis dan sinkronisasi NASA memerlukan langkah tambahan; lihat dokumentasi lanjutan di bawah.
 
-## Audit dan import data
+## 8. Hubungkan frontend (opsional)
 
-```bash
-.venv/bin/python -m app.cli audit-gwt dataset/mmc1.xlsx
-.venv/bin/python -m app.cli import-gwt dataset/mmc1.xlsx
-.venv/bin/python -m app.cli import-gwt dataset/mmc1.xlsx --apply
-.venv/bin/python -m app.cli audit-hotspots dataset/viirs-snpp_2019_Indonesia.csv \
-  --output var/audits/viirs-2019.json
-.venv/bin/python -m app.cli import-hotspots dataset/viirs-snpp_2019_Indonesia.csv \
-  --from 2019-08-01 --to 2019-08-31 --bbox '100,-4,112,2' --apply
+Pada folder frontend, buat atau sesuaikan `.env.local`:
+
+```dotenv
+NEXT_PUBLIC_DATA_SOURCE=rest
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1
+NEXT_PUBLIC_DEMO_COORDINATOR_TOKEN=demo-coordinator-token
+NEXT_PUBLIC_DEMO_FIELD_OFFICER_TOKEN=demo-field-officer-token
 ```
 
-Import tanpa `--apply` hanya mengaudit. Import hotspot tanpa filter tanggal/bbox memerlukan
-`--allow-full-dataset`. Ketiga CSV lokal memuat 809.523 baris; gunakan filter untuk demo kecil.
-Nama file harus memuat `snpp` atau `jpss1` agar produk dapat diidentifikasi.
+Token di atas tersedia untuk development/test. Jika token di `.env` backend sudah diubah, gunakan nilai yang sama di frontend.
 
-Audit JSON dan CSV GWT ternormalisasi ditulis ke `var/audits/`, yang diabaikan Git. Workbook
-asli dipertahankan. Hash SHA-256 dan nomor baris sumber disimpan bersama data; riwayat import
-menyimpan audit, jumlah insert/skip, dan waktu selesai. Seluruh file dalam satu perintah import
-berada dalam satu transaksi; kegagalan menyebabkan rollback.
+Jalankan ulang frontend setelah mengubah konfigurasi. Pastikan backend tetap berjalan. Jika frontend memakai alamat atau port lain, sesuaikan `CORS_ALLOWED_ORIGINS` di `.env` backend, lalu jalankan ulang backend.
 
-Kebijakan GWT: `#N/A` menjadi `null/MISSING`; konflik duplikat menjadi satu observasi
-`null/DUPLICATE`, dengan nilai mentah tersimpan pada audit. BRG5 tanggal 2019-03-21 memiliki
-dua nilai berbeda. Audit menghasilkan 3.928 observasi unik: 3.534 valid, 393 missing, dan satu
-konflik duplikat. Tidak ada interpolasi atau koreksi tanggal otomatis. Sheet `wrc` (110 baris)
-hanya dicatat sebagai arsip penelitian. Kalender yang tidak memiliki baris tetap menjadi gap.
+## Kendala yang sering muncul
 
-Semua import lokal memakai `HISTORICAL_REPLAY`. Koordinat stasiun tetap null sampai sumber
-terverifikasi tersedia. Timestamp GWT pada API adalah representasi tanggal harian pada
-00:00 UTC, bukan jam pengukuran yang diketahui. Data penelitian dapat mengandung pengolahan
-sebelumnya; flag VALID berarti numerik valid untuk pipeline, bukan bukti pengukuran langsung.
+- **Perintah `python3` tidak ditemukan atau versinya terlalu lama:** pasang Python 3.12+, lalu buka ulang terminal.
+- **Gagal membuat `.venv`:** pastikan modul `venv` untuk versi Python yang digunakan sudah terpasang.
+- **Docker tidak dapat dihubungi:** jalankan Docker Desktop atau layanan Docker terlebih dahulu.
+- **Koneksi database ditolak:** cek `docker compose ps`, tunggu status healthy, dan pastikan `DATABASE_URL` memakai port 5433.
+- **Tabel belum ditemukan:** jalankan `.venv/bin/alembic upgrade head` sebelum memulai API.
+- **Port 8000 sedang digunakan:** jalankan `.venv/bin/uvicorn app.main:app --reload --port 8001`. Sesuaikan juga alamat API di frontend.
+- **Data pemantauan kosong:** database baru belum memiliki observasi; lakukan import data historis atau konfigurasi sinkronisasi sesuai kebutuhan.
 
-VIIRS memakai waktu akuisisi UTC, confidence mentah, instrument dan satellite dari CSV,
-serta key stabil dari produk/satelit/waktu/koordinat. Reimport tidak menambah observasi yang
-sama. `last_synced_at` pada CSV berarti waktu import lokal, bukan keberhasilan sync NASA live.
-Hotspot menunjukkan anomali panas satelit; confidence tidak menunjukkan probabilitas kebakaran.
-
-## Kontrak read API
-
-- `GET /api/v1/stations`: array stasiun terurut menurut code, ID berupa UUID.
-- `GET /api/v1/stations/{uuid}/groundwater?from=2019-01-01&to=2019-01-31&mode=HISTORICAL_REPLAY`:
-  array observasi terurut tanggal naik, batas tanggal inklusif, nilai null dipertahankan.
-- `GET /api/v1/hotspots?from=2019-01-01&to=2019-01-31&bbox=100,-4,112,2&satellite=N`:
-  respons `{items,total,limit,offset}`, default limit 200, maksimum 1000; terurut waktu turun
-  dengan UUID sebagai pemutus urutan. `source_product` dan `mode` juga dapat difilter.
-
-Mode default adalah `HISTORICAL_REPLAY`. Query `CURRENT_MONITORING` kosong sampai observasi
-terkini tersedia. API menolak rentang tanggal terbalik, bbox tidak valid, UUID invalid, dan
-pagination di luar batas dengan `422`; stasiun tidak ditemukan menghasilkan `404`.
-Produk CSV: `VIIRS_SNPP_HISTORICAL` dan `VIIRS_NOAA20_HISTORICAL`; satellite mentah `N`/`N20`.
-Koneksi read API memakai SQLAlchemy async; import CLI memakai transaksi sinkron dan COPY.
-
-## Database
-
-Migration pertama mengaktifkan PostGIS dan `pgcrypto`, lalu membuat:
-
-- `data_sources`, `stations`, dan `groundwater_observations` dengan provenance serta nilai null;
-- `hotspots` dengan titik EPSG:4326 dan indeks GiST;
-- `priority_assessments` dengan snapshot JSON dan versi rule;
-- `users`, `inspection_tasks`, `field_reports`, serta `task_status_history`.
-- `data_import_runs` untuk audit dan hasil import; kolom mode membedakan observasi historis/terkini.
-- `firms_sync_runs` untuk status/riwayat percobaan sync, cooldown dan sumber respons.
-- Migration workflow melengkapi task dengan mode/area/label simulasi, validasi hasil laporan,
-  history aktor/catatan, indeks foreign key, serta RLS untuk tabel workflow.
-
-Koordinat stasiun harus lengkap dan memiliki `coordinate_source`. Status, role, mode, prioritas,
-dan kualitas data dibatasi oleh constraint database. Menjalankan migration offline tanpa database:
-
-```bash
-.venv/bin/alembic upgrade head --sql
-```
-
-## Verifikasi
+## Pemeriksaan kode (opsional)
 
 ```bash
 .venv/bin/ruff check .
 .venv/bin/pytest
 ```
 
-Smoke Supabase end-to-end tanpa meninggalkan task/report pengujian:
+Tes integrasi database memerlukan `TEST_DATABASE_URL` menuju database khusus dengan nama berakhiran `_test`. Tanpa konfigurasi tersebut, tes integrasi terkait dilewati. Lihat [panduan pengujian](docs/backend-qa.md) untuk detailnya.
 
-```bash
-.venv/bin/python scripts/smoke_supabase_api.py
-```
+## Dokumentasi lanjutan
 
-Script memeriksa health/OpenAPI, users, stations, GWT, hotspot Batanghari, priorities dua area,
-metrics serta forecast BRG3/BRG6 yang dibandingkan dengan artifact, penolakan forecast tanpa
-riwayat GWT, dan workflow `ASSIGNED → IN_PROGRESS → SUBMITTED → VERIFIED`. Token mengikuti
-settings backend. Seluruh write dijalankan pada savepoint lalu transaksi luar di-rollback;
-eksekusi dibatasi 120 detik. Hasil QA terbaru: **67 tes PASS tanpa skip** dengan PostGIS
-terisolasi, Ruff PASS dan smoke Supabase PASS. Prosedur serta batas verifikasi tersedia di
-[backend-qa.md](docs/backend-qa.md).
-
-Tes foundation mencakup health, autentikasi/otorisasi role, CORS, publikasi kontrak OpenAPI,
-konfigurasi production, nullable GWT, mode historis, metadata tabel, kontrak task/report, dan
-state machine. Tes migration serta persistensi workflow terhadap PostgreSQL nyata memerlukan
-Docker/PostGIS yang aktif.
-
-Tes data mencakup audit workbook nyata, duplikat, null/nol, UTC, key stabil, filter, dan API.
-Integration test memakai database khusus dengan nama berakhiran `_test`, lalu menjalankan
-migration upgrade/downgrade; jangan arahkan ke database aplikasi yang memiliki data penting.
-
-```bash
-TEST_DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/gambutops_test \
-  .venv/bin/pytest
-```
-
-Tanpa variabel tersebut tes integrasi dilewati dengan alasan eksplisit.
-
+- [Setup database eksternal, import titik panas, dan hosting](SPLIT_REPOSITORY.md)
+- [Kontrak API pemantauan](docs/read-api-handoff.md)
+- [Sinkronisasi NASA FIRMS](docs/firms-handoff.md)
+- [Prioritas pemeriksaan](docs/priorities-handoff.md)
+- [Alur tugas dan laporan lapangan](docs/tasks-handoff.md)
+- [Eksperimen prediksi historis](docs/ml-handoff.md)
